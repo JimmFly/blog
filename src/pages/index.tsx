@@ -1,8 +1,9 @@
 import Head from "next/head";
 import Layout, { siteTitle } from "../components/Layout";
-import utilStyles from "../styles/utils.module.css";
+import utilStyles from "../styles/Home.module.css";
 import { getSortedPostsData } from "../utils/posts";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import Date from "../components/Date";
 import { GetStaticProps } from "next";
 
@@ -15,6 +16,7 @@ export default function Home({
     id: string;
   }[];
 }) {
+  const { locale } = useRouter();
   return (
     <Layout home>
       <Head>
@@ -32,12 +34,12 @@ export default function Home({
         <ul className={utilStyles.list}>
           {allPostsData.map(({ id, date, title }) => (
             <li className={utilStyles.listItem} key={id}>
-              <Link href={`/posts/${id}`}>
+              <Link href={`${id}`}>
                 <a>{title}</a>
               </Link>
               <br />
               <small className={utilStyles.lightText}>
-                <Date dateString={date} />
+                <Date dateString={date} locale={locale as string} />
               </small>
             </li>
           ))}
@@ -47,8 +49,8 @@ export default function Home({
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
-  const allPostsData = getSortedPostsData();
+export const getStaticProps: GetStaticProps = async ({ locale }: any) => {
+  const allPostsData = getSortedPostsData(locale);
   return {
     props: {
       allPostsData,

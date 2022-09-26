@@ -2,8 +2,9 @@ import Layout from "../components/Layout";
 import { getAllPostIds, getPostData } from "../utils/posts";
 import Head from "next/head";
 import Date from "../components/Date";
-import utilStyles from "../../styles/utils.module.css";
+import utilStyles from "../styles/Home.module.css";
 import { GetStaticProps, GetStaticPaths } from "next";
+import { useRouter } from "next/router";
 
 export default function Post({
   postData,
@@ -14,6 +15,7 @@ export default function Post({
     contentHtml: string;
   };
 }) {
+  const { locale } = useRouter();
   return (
     <Layout>
       <Head>
@@ -22,7 +24,7 @@ export default function Post({
       <article>
         <h1 className={utilStyles.headingXl}>{postData.title}</h1>
         <div className={utilStyles.lightText}>
-          <Date dateString={postData.date} />
+          <Date dateString={postData.date} locale={locale as string} />
         </div>
         <div dangerouslySetInnerHTML={{ __html: postData.contentHtml }} />
       </article>
@@ -30,16 +32,16 @@ export default function Post({
   );
 }
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  const paths = getAllPostIds();
+export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
+  const paths = getAllPostIds(locales as string[]);
   return {
     paths,
     fallback: false,
   };
 };
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
-  const postData = await getPostData(params?.id as string);
+export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
+  const postData = await getPostData(params!.id as string, locale as string);
   return {
     props: {
       postData,
